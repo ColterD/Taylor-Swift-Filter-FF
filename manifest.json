@@ -1,26 +1,24 @@
 {
-    "manifest_version": 2,
-    "name": "Content Filter",
-    "version": "1.0",
-    "description": "Filter web content based on preferences",
-    "permissions": [
-      "activeTab",
-      "storage",
-      "webNavigation",
-      "<all_urls>"
-    ],
-    "background": {
-      "scripts": ["background.js"],
-      "persistent": false
-    },
-    "content_scripts": [
-      {
-        "matches": ["<all_urls>"],
-        "js": ["content.js"]
-      }
-    ],
-    "browser_action": {
-      "default_popup": "popup.html"
+  "manifest_version": 2,
+  "name": "Content Filter",
+  "version": "1.0",
+  "description": "Filter out specific content from web pages",
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
     }
+  ],
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "options_ui": {
+    "page": "options.html",
+    "chrome_style": true
+  },
+  "icons": {
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png"
   }
-  
+}

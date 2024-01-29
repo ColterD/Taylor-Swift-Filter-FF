@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Extension Settings</title>
+    <style>
+        /* Add styles for sliders, toggles, and layout */
+        /* ... */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Content Filter Settings</h1>
+        <form id="settingsForm">
+            <label for="keywords">Keywords to filter (comma-separated):</label>
+            <input type="text" id="keywords" name="keywords">
+
+            <h2>Filtering Intensity</h2>
+            <input type="range" id="intensity" name="intensity" min="1" max="3">
+            
+            <h2>Site-Specific Settings</h2>
+            <label>
+                <input type="checkbox" id="enableOnSiteA" name="enableOnSiteA"> Enable on Site A
+            </label>
+            <!-- Add more toggles for different sites as needed -->
+
+            <button type="submit">Save Settings</button>
+        </form>
+    </div>
+    <script src="options.js"></script>
+</body>
+</html>

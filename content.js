@@ -4,38 +4,57 @@ function containsKeywords(text, keywords) {
     return keywords.some(keyword => keyword.test(text));
 }
 
-function hideElementContainingKeywords() {
-    const generalKeywords = [/taylor swift/i, /travis kelce/i, /t[-\s]?swift/i, /swiftie(s)?/i];
-    const generalElements = document.querySelectorAll('p, h1, h2, h3, img, span');
+function debounce(func, wait, immediate) {
+    let timeout;
+    return function() {
+        const context = this, args = arguments;
+        clearTimeout(timeout);
+        timeout = setTimeout(function() {
+            timeout = null;
+            if (!immediate) func.apply(context, args);
+        }, wait);
+        if (immediate && !timeout) func.apply(context, args);
+    };
+}
 
-    generalElements.forEach(element => {
-        let textToCheck = element.tagName === 'IMG' ? element.alt : element.textContent;
-        if (containsKeywords(textToCheck, generalKeywords)) {
-            console.log('Hiding general element:', element);
+function hideElements(selector, keywords) {
+    const elements = document.querySelectorAll(selector);
+
+    elements.forEach(element => {
+        let textToCheck = element.tagName === 'IMG' ? element.alt || element.src : element.textContent;
+        if (containsKeywords(textToCheck, keywords)) {
             element.style.display = 'none';
         }
     });
 }
 
-function hideTMZArticles() {
-    const tmzKeywords = [/taylor swift/i];
-    const tmzArticleElements = document.querySelectorAll('[class*="blogroll"]');
+function applyFilteringWithUserSettings() {
+    try {
+        browser.storage.local.get('filteredKeywords', (data) => {
+            const userKeywords = data.filteredKeywords || [/taylor swift/i]; // Default keywords
+            hideElements('p, h1, h2, h3, img, span', userKeywords);
+        });
+    } catch (error) {
+        console.error('Error in content filtering:', error);
+    }
+}
 
-    tmzArticleElements.forEach(article => {
-        let articleText = article.textContent || "";
-        if (containsKeywords(articleText, tmzKeywords)) {
-            console.log('Hiding TMZ article:', article);
-            article.style.display = 'none';
-        } else {
-            console.log('TMZ article does not contain keywords:', article);
-        }
+const debouncedFiltering = debounce(applyFilteringWithUserSettings, 250);
+
+function observeDynamicContent() {
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.addedNodes.length) {
+                debouncedFiltering();
+            }
+        });
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
     });
 }
 
-// Apply general filtering
-hideElementContainingKeywords();
-
-// Apply TMZ-specific filtering if on TMZ
-if (window.location.hostname.includes('tmz.com')) {
-    hideTMZArticles();
-}
+debouncedFiltering();
+observeDynamicContent();
